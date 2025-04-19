@@ -7,13 +7,16 @@ const addAppliance = async (req, res) => {
   try {
     const {
       name,
+      type, // Add type to destructuring
       purchaseDate,
       warrantyExpiryDate,
       maintenanceDuration,
     } = req.body;
 
+    // Add type to required fields check
     if (
       !name ||
+      !type ||
       !purchaseDate ||
       !warrantyExpiryDate ||
       !maintenanceDuration
@@ -23,6 +26,7 @@ const addAppliance = async (req, res) => {
 
     const newAppliance = new Appliance({
       name,
+      type, // Include type in new appliance
       purchaseDate: new Date(purchaseDate),
       warrantyExpiryDate: new Date(warrantyExpiryDate),
       maintenanceDuration,
@@ -37,10 +41,12 @@ const addAppliance = async (req, res) => {
     res.status(201).json({ message: "Appliance added successfully" });
   } catch (error) {
     console.error("Error adding appliance:", error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: "Invalid appliance type" });
+    }
     res.status(500).json({ error: "Server error" });
   }
 };
-
 const getAppliances = async (req, res) => {
   try {
     // Only get appliances for the logged-in user
